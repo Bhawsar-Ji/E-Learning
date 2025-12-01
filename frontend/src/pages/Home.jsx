@@ -1,5 +1,5 @@
 import React from 'react'
-import home from "../assets/homebg.png"
+import home from "../assets/homed.png"
 import Nav from '../components/Nav'
 import { SiViaplay } from "react-icons/si";
 import Logos from '../components/Logos';
@@ -20,20 +20,22 @@ function Home() {
     
     <div className='w-[100%] overflow-hidden'>
       <Nav/>
-      <div className='w-[100%] lg:h-[110vh] h-[70vh] relative'>
-        <img src={home} className='object-cover md:object-fill   w-[100%] lg:h-[100%] h-[50vh]' alt="" />
-        <span className='lg:text-[70px] absolute  md:text-[40px]  lg:top-[20%] top-[18%] w-[100%] flex items-center justify-center text-white font-bold text-[20px] '>
+      <div className=' w-[100%] lg:h-[110vh] h-[70vh] relative'>
+        <img src={home} className='object-cover md:object-fill   w-[100%] lg:h-[100%] h-[40vh]' alt="" />
+        
+        <span className='lg:text-[70px] absolute  md:text-[40px]  lg:top-[23%] top-[16%] w-[100%] flex items-center justify-center text-white font-bold text-[28px] '>
           Grow Your Skills to Advance 
         </span>
-        <span className='lg:text-[70px] text-[20px] md:text-[40px] absolute lg:top-[28%] top-[20%] w-[100%] flex items-center justify-center text-white font-bold'>
+        <span className='lg:text-[70px] text-[30px] md:text-[40px] absolute lg:top-[30%] top-[22%] w-[100%] flex items-center justify-center text-white font-bold'>
           Your Career path
         </span>
-        <div className='absolute lg:top-[47%] top-[75%]  md:top-[80%] w-[100%] flex items-center justify-center gap-3 flex-wrap'>
-          
+        <div className='absolute lg:top-[44%] top-[65%]  md:top-[75%] w-[100%] flex items-center justify-center gap-3 flex-wrap'>
+    
       <button className='px-[20px] py-[10px] border-2 lg:border-white border-black lg:text-white text-black rounded-[10px] text-[18px] font-light flex gap-2 cursor-pointer' onClick={()=>navigate("/allcourses")}>View all Courses <SiViaplay className='w-[30px] h-[30px] lg:fill-white fill-black' /></button>
       <button className='px-[20px] py-[10px] lg:bg-white bg-black lg:text-black text-white rounded-[10px] text-[18px] font-light flex gap-2 cursor-pointer items-center justify-center' onClick={()=>navigate("/searchwithai")}>Search with AI <img src={ai} className='w-[30px] h-[30px] rounded-full hidden lg:block' alt="" /><img src={ai1} className='w-[35px] h-[35px] rounded-full lg:hidden' alt="" /></button>
       </div>
       </div>
+      
       <Logos/>
       <ExploreCourses/>
       <Cardspage/>
