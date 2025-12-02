@@ -1,30 +1,34 @@
-import nodemailer from "nodemailer"
-import dotenv from "dotenv"
-dotenv.config()
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
+
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    tls: {
-      ciphers: 'SSLv3',
-    },
-    port: 465,
-    secure: true,
+  service: "gmail",
+  secure: false,
   auth: {
     user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASS,
+    pass: process.env.EMAIL_PASS,  // Make sure this is App Password
   },
 });
 
+const sendMail = (to, otp) => {
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(
+      {
+        from: process.env.EMAIL,
+        to: to,
+        subject: "Reset Your Password",
+        html: `<p>Your OTP for Password Reset is <b>${otp}</b>. It expires in 5 minutes.</p>`,
+      },
+      (err, info) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(info);
+        }
+      }
+    );
+  });
+};
 
-const sendMail=async (to,otp) => {
-    transporter.sendMail({
-        from:process.env.EMAIL,
-        to:to,
-        subject:"Reset Your Password",
-        html:`<p>Your OTP for Password Reset is <b>${otp}</b>.
-        It expires in 5 minutes.</p>`
-    })
-}
-
-
-export default sendMail
+export default sendMail;
