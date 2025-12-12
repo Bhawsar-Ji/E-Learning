@@ -7,7 +7,7 @@ const team = [
     role: "Frontend Developer",
     img: "https://res.cloudinary.com/dkhbhumqj/image/upload/v1764517029/1000006055_b1robw.png",
     color: "bg-gray-300",
-    instagram: "https://www.linkedin.com/in/atharv-bhawsar",
+    instagram: "https://www.instagram.com/_x__at_harv__x_",
   },
   {
     name: "PIYUSH BHAWSAR",
