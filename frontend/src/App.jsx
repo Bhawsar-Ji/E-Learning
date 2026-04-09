@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux'
 import Profile from './pages/Profile'
 import EditProfile from './pages/EditProfile'
 import Dashboard from './pages/admin/Dashboard'
+import StudentDashboard from './pages/Dashboard'
 import Courses from './pages/admin/Courses'
 import AllCouses from './pages/AllCouses'
 import AddCourses from './pages/admin/AddCourses'
@@ -27,16 +28,27 @@ import ViewLecture from './pages/ViewLecture'
 import SearchWithAi from './pages/SearchWithAi'
 import getAllReviews from './customHooks/getAllReviews'
 
-export const serverUrl = "https://e-learning-m3z7.onrender.com"
+export const serverUrl = import.meta.env.VITE_SERVER_URL || "https://e-learning-m3z7.onrender.com"
 
 function App() {
   
-  let {userData} = useSelector(state=>state.user)
+  const { userData, loading } = useSelector(state=>state.user)
 
   getCurrentUser()
   getCouseData()
   getCreatorCourseData()
   getAllReviews()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-700">
+        <div className="rounded-3xl border border-gray-200 bg-white px-8 py-6 shadow-sm">
+          Loading your experience...
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
     
@@ -57,7 +69,7 @@ function App() {
          <Route path='/searchwithai' element={userData?<SearchWithAi/>:<Navigate to={"/signup"}/>}/>
         
         
-        <Route path='/dashboard' element={userData?.role === "educator"?<Dashboard/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/dashboard' element={userData ? (userData?.role === "educator" ? <Dashboard/> : <StudentDashboard/>) : <Navigate to={"/signup"}/>}/>
         <Route path='/courses' element={userData?.role === "educator"?<Courses/>:<Navigate to={"/signup"}/>}/>
         <Route path='/addcourses/:courseId' element={userData?.role === "educator"?<AddCourses/>:<Navigate to={"/signup"}/>}/>
         <Route path='/createcourses' element={userData?.role === "educator"?<CreateCourse/>:<Navigate to={"/signup"}/>}/>

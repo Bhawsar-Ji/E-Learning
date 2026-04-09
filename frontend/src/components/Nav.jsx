@@ -40,7 +40,7 @@ const Nav = () => {
 
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center gap-6">
-          {userData?.role === "educator" && (
+          {userData && (
             <button
               onClick={() => navigate("/dashboard")}
               className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium hover:opacity-90 transition"
@@ -151,14 +151,12 @@ const Nav = () => {
                 >
                   My Courses
                 </button>
-                {userData?.role === "educator" && (
-                  <button
-                    onClick={() => navigate("/dashboard")}
-                    className="w-[70%] text-center py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:opacity-90"
-                  >
-                    Dashboard
-                  </button>
-                )}
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="w-[70%] text-center py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:opacity-90"
+                >
+                  Dashboard
+                </button>
                 <button
                   onClick={handleLogout}
                   className="w-[70%] text-center py-3 bg-white text-black rounded-xl shadow hover:bg-gray-200"
