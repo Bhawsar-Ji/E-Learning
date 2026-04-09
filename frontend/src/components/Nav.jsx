@@ -39,7 +39,7 @@ const Nav = () => {
         />
 
         {/* Desktop Menu */}
-        <div className="hidden lg:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-6">
           {userData && (
             <button
               onClick={() => navigate("/dashboard")}
@@ -117,7 +117,7 @@ const Nav = () => {
 
         {/* Hamburger Icon */}
         <GiHamburgerMenu
-          className="w-7 h-7 text-white lg:hidden cursor-pointer"
+          className="w-7 h-7 text-white md:hidden cursor-pointer"
           onClick={() => setShowHam(true)}
         />
       </div>
@@ -126,52 +126,69 @@ const Nav = () => {
       <AnimatePresence>
         {showHam && (
           <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            initial={{ y: "-100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-lg flex flex-col items-center justify-center gap-6 z-40"
+            className="fixed inset-0 md:hidden bg-black/50 backdrop-blur-sm z-40"
           >
-            <GiSplitCross
-              className="absolute top-5 right-5 w-8 h-8 text-white cursor-pointer"
-              onClick={() => setShowHam(false)}
-            />
+            <div className="absolute top-[70px] left-0 right-0 mx-auto w-full max-w-md rounded-b-[32px] bg-white p-6 shadow-2xl">
+              <GiSplitCross
+                className="absolute top-5 right-5 w-8 h-8 text-black cursor-pointer"
+                onClick={() => setShowHam(false)}
+              />
 
-            {userData ? (
-              <>
+              {userData ? (
+                <div className="flex flex-col gap-4 pt-10">
+                  <button
+                    onClick={() => {
+                      setShowHam(false);
+                      navigate("/profile");
+                    }}
+                    className="w-full rounded-2xl bg-gray-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-black"
+                  >
+                    My Profile
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowHam(false);
+                      navigate("/enrolledcourses");
+                    }}
+                    className="w-full rounded-2xl bg-gradient-to-r from-indigo-300 to-purple-400 px-4 py-3 text-sm font-medium text-indigo-800 transition hover:bg-gray-200"
+                  >
+                    My Courses
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowHam(false);
+                      navigate("/dashboard");
+                    }}
+                    className="w-full rounded-2xl bg-gradient-to-r from-indigo-400 to-purple-600 px-4 py-3 text-sm font-medium text-indigo-950 transition hover:opacity-90"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setShowHam(false);
+                      await handleLogout();
+                    }}
+                    className="w-full rounded-2xl bg-white border border-gray-200 px-4 py-3 text-sm font-medium text-black transition hover:bg-gray-50"
+                  >
+                    Log Out
+                  </button>
+                </div>
+              ) : (
                 <button
-                  onClick={() => navigate("/profile")}
-                  className="w-[70%] text-center py-3 bg-white/20 text-white rounded-xl border border-white/20 hover:bg-white/30"
+                  onClick={() => {
+                    setShowHam(false);
+                    navigate("/login");
+                  }}
+                  className="w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium text-black transition hover:bg-gray-100"
                 >
-                  My Profile
+                  Login
                 </button>
-                <button
-                  onClick={() => navigate("/enrolledcourses")}
-                  className="w-[70%] text-center py-3 bg-white/20 text-white rounded-xl border border-white/20 hover:bg-white/30"
-                >
-                  My Courses
-                </button>
-                <button
-                  onClick={() => navigate("/dashboard")}
-                  className="w-[70%] text-center py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:opacity-90"
-                >
-                  Dashboard
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-[70%] text-center py-3 bg-white text-black rounded-xl shadow hover:bg-gray-200"
-                >
-                  Log Out
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => navigate("/login")}
-                className="w-[70%] text-center py-3 bg-white text-black rounded-xl shadow hover:bg-gray-200"
-              >
-                Login
-              </button>
-            )}
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
