@@ -9,6 +9,7 @@ import axios from "axios";
 import { serverUrl } from "../App";
 import { setUserData } from "../redux/userSlice";
 import logo from "../assets/logo.png";
+import Button from "./Button";
 
 const Nav = () => {
   const [showHam, setShowHam] = useState(false);
@@ -41,30 +42,21 @@ const Nav = () => {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-6">
           {userData && (
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium hover:opacity-90 transition"
-            >
-              Dashboard
-            </button>
+            <Button text = "Dashboard" onClick={() => navigate("/dashboard")}/>
           )}
 
           {!userData && (
-            <button
+            <Button text = "Log in"
               onClick={() => navigate("/login")}
               className="px-5 py-2 rounded-xl bg-white/20 text-white border border-white/30 hover:bg-white/30 transition"
-            >
-              Login
-            </button>
+            />
           )}
 
           {userData && (
-            <button
+            <Button text = "Log Out"
               onClick={handleLogout}
               className="px-5 py-2 rounded-xl bg-white text-black font-medium shadow hover:bg-gray-200 transition"
-            >
-              Log Out
-            </button>
+            />
           )}
 
           {/* Profile Avatar */}
