@@ -41,7 +41,7 @@ const Nav = () => {
         <img
           src={logo}
           alt="Logo"
-          className="h-16 w-auto brightness-80 saturate-200 cursor-pointer scale-170 hover:scale-140 transition"
+          className="h-12 md:h-16 w-auto brightness-80 saturate-200 cursor-pointer scale-120 md:scale-170 hover:scale-140 transition"
           onClick={() => navigate("/")}
         />
 
