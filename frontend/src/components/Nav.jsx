@@ -127,6 +127,76 @@ const Nav = () => {
           onClick={() => setShowHam(true)}
         />
       </div>
+{/* Mobile Menu */}
+      <AnimatePresence>
+        {showHam && (
+          <motion.div
+            initial={{ y: "-100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed inset-0 md:hidden bg-black/50 backdrop-blur-sm z-40"
+          >
+            <div className="absolute top-[70px] left-0 right-0 mx-auto w-full max-w-md rounded-b-[32px] bg-white p-6 shadow-2xl">
+              <GiSplitCross
+                className="absolute top-5 right-5 w-8 h-8 text-black cursor-pointer"
+                onClick={() => setShowHam(false)}
+              />
+
+              {userData ? (
+                <div className="flex flex-col gap-4 pt-10">
+                  <button
+                    onClick={() => {
+                      setShowHam(false);
+                      navigate("/profile");
+                    }}
+                    className="w-full rounded-2xl bg-gray-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-black"
+                  >
+                    My Profile
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowHam(false);
+                      navigate("/enrolledcourses");
+                    }}
+                    className="w-full rounded-2xl bg-gradient-to-r from-indigo-300 to-purple-400 px-4 py-3 text-sm font-medium text-indigo-800 transition hover:bg-gray-200"
+                  >
+                    My Courses
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowHam(false);
+                      navigate("/dashboard");
+                    }}
+                    className="w-full rounded-2xl bg-gradient-to-r from-indigo-400 to-purple-600 px-4 py-3 text-sm font-medium text-indigo-950 transition hover:opacity-90"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setShowHam(false);
+                      await handleLogout();
+                    }}
+                    className="w-full rounded-2xl bg-white border border-gray-200 px-4 py-3 text-sm font-medium text-black transition hover:bg-gray-50"
+                  >
+                    Log Out
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    setShowHam(false);
+                    navigate("/login");
+                  }}
+                  className="w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium text-black transition hover:bg-gray-100"
+                >
+                  Login
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
