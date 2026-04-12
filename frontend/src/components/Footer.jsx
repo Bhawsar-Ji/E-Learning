@@ -10,7 +10,7 @@ const Footer = () => {
 
         {/* Logo + Description */}
         <div className="lg:w-[40%] md:w-[50%] w-[100%]">
-          <img src={logo} alt="Logo" className="h-11 mb-3 rounded-b-full border-1 " />
+          <img src={logo} alt="Logo" className=" scale-100 h-22 mb-0.2 rounded-b-md " />
           <h2 className="text-xl font-bold text-white mb-3">Course Crush</h2>
           <p className="text-sm">
             E - learning platform to help you grow smarter. Learn anything, anytime, anywhere.
