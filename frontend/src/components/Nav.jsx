@@ -127,7 +127,7 @@ const Nav = () => {
           onClick={() => setShowHam(true)}
         />
       </div>
-      {/* Mobile Menu */}
+{/* Mobile Menu */}
       <AnimatePresence>
         {showHam && (
           <motion.div
@@ -137,14 +137,14 @@ const Nav = () => {
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed inset-0 md:hidden bg-black/50 backdrop-blur-sm z-40"
           >
-            <div className="absolute top-[70px] left-0 right-0 mx-auto w-full max-w-md rounded-b-[32px] bg-white p-6 backdrop-blur-sm shadow-2xl">
+            <div className="absolute top-[70px] left-0 right-0 mx-auto w-full max-w-md rounded-b-[32px] bg-white p-6 shadow-2xl">
               <GiSplitCross
                 className="absolute top-5 right-5 w-8 h-8 text-black cursor-pointer"
                 onClick={() => setShowHam(false)}
               />
 
               {userData ? (
-                <div className="flex flex-col  gap-4 pt-10">
+                <div className="flex flex-col gap-4 pt-10">
                   <button
                     onClick={() => {
                       setShowHam(false);
