@@ -1,17 +1,40 @@
-import React  from 'react'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 
 import { useSelector } from 'react-redux';
 
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { serverUrl } from '../App';
 
 function EnrolledCourse() {
   const navigate = useNavigate()
+  const [progressMap, setProgressMap] = useState({})
 
   const { userData } = useSelector((state) => state.user);
 
-     
-   
+  useEffect(() => {
+    const fetchProgressForCourses = async () => {
+      if (!userData?.enrolledCourses?.length) return;
+
+      try {
+        const progressEntries = await Promise.all(
+          userData.enrolledCourses.map(async (course) => {
+            const response = await axios.get(`${serverUrl}/api/progress/${course._id}`, {
+              withCredentials: true,
+            });
+            return [course._id, response.data?.progressPercentage || 0];
+          })
+        );
+
+        setProgressMap(Object.fromEntries(progressEntries));
+      } catch (error) {
+        console.error("Failed to load enrolled course progress", error);
+      }
+    };
+
+    fetchProgressForCourses();
+  }, [userData]);
  
 
   return (
@@ -41,6 +64,18 @@ function EnrolledCourse() {
                 <h2 className="text-lg font-semibold text-gray-800">{course.title}</h2>
                 <p className="text-sm text-gray-600 mb-2">{course.category}</p>
                 <p className="text-sm text-gray-700">{course.level}</p>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                    <span>Progress</span>
+                    <span className="font-semibold text-gray-900">{progressMap[course._id] ?? 0}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                    <div
+                      className="h-full rounded-full bg-black transition-all duration-300"
+                      style={{ width: `${progressMap[course._id] ?? 0}%` }}
+                    />
+                  </div>
+                </div>
                 <h1 className='px-[10px] text-center  py-[10px] border-2  bg-black border-black text-white  rounded-[10px] text-[15px] font-light flex items-center justify-center gap-2 cursor-pointer mt-[10px] hover:bg-gray-600' onClick={()=>navigate(`/viewlecture/${course._id}`)}>Watch Now</h1>
               </div>
             </div>

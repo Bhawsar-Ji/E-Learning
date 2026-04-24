@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaPlayCircle } from 'react-icons/fa';
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { serverUrl } from '../App';
 
 function ViewLecture() {
   const { courseId } = useParams();
@@ -13,9 +15,122 @@ function ViewLecture() {
   const [selectedLecture, setSelectedLecture] = useState(
     selectedCourse?.lectures?.[0] || null
   );
-  const navigate = useNavigate()
+  const [progressData, setProgressData] = useState({
+    completedLessons: [],
+    lastWatchedLesson: null,
+    progressPercentage: 0,
+  });
+  const progressInterval = useRef(null);
+  const videoRef = useRef(null);
+  const navigate = useNavigate();
   const courseCreator = userData?._id === selectedCourse?.creator ? userData : null;
 
+  const loadProgress = async () => {
+    if (!courseId) return;
+    try {
+      const response = await axios.get(`${serverUrl}/api/progress/${courseId}`, {
+        withCredentials: true,
+      });
+      const progress = response.data;
+      const lastLecture = selectedCourse?.lectures?.find(
+        (lecture) => lecture._id?.toString() === progress.lastWatchedLesson?.toString()
+      );
+      setProgressData({
+        completedLessons: progress.completedLessons || [],
+        lastWatchedLesson: progress.lastWatchedLesson,
+        progressPercentage: progress.progressPercentage || 0,
+      });
+      if (lastLecture) {
+        setSelectedLecture(lastLecture);
+      }
+    } catch (error) {
+      console.error("Unable to load progress", error);
+    }
+  };
+
+  const saveProgress = async (lessonId) => {
+    if (!courseId || !lessonId || !selectedCourse?.lectures) return;
+    try {
+      const lectureIndex = selectedCourse.lectures.findIndex(
+        (lecture) => lecture._id?.toString() === lessonId.toString()
+      );
+      const progressPercentage = selectedCourse.lectures.length
+        ? Math.round(((lectureIndex + 1) / selectedCourse.lectures.length) * 100)
+        : 0;
+
+      const response = await axios.post(
+        `${serverUrl}/api/progress/update`,
+        {
+          courseId,
+          lessonId,
+          progressPercentage,
+        },
+        { withCredentials: true }
+      );
+
+      setProgressData({
+        completedLessons: response.data.completedLessons || progressData.completedLessons,
+        lastWatchedLesson: response.data.lastWatchedLesson || lessonId,
+        progressPercentage: response.data.progressPercentage || progressPercentage,
+      });
+    } catch (error) {
+      console.error("Unable to save progress", error);
+    }
+  };
+
+  const markLessonComplete = async (lessonId) => {
+    if (!courseId || !lessonId) return;
+    try {
+      const response = await axios.patch(
+        `${serverUrl}/api/progress/lesson-complete`,
+        { courseId, lessonId },
+        { withCredentials: true }
+      );
+      setProgressData({
+        completedLessons: response.data.completedLessons || [],
+        lastWatchedLesson: response.data.lastWatchedLesson || lessonId,
+        progressPercentage: response.data.progressPercentage || progressData.progressPercentage,
+      });
+    } catch (error) {
+      console.error("Unable to mark lesson complete", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedCourse) return;
+    const startingLecture = selectedCourse?.lectures?.find(
+      (lecture) => lecture._id?.toString() === progressData.lastWatchedLesson?.toString()
+    ) || selectedCourse?.lectures?.[0] || null;
+    setSelectedLecture(startingLecture);
+    loadProgress();
+  }, [courseId, selectedCourse]);
+
+  useEffect(() => {
+    if (!selectedLecture) return;
+
+    saveProgress(selectedLecture._id);
+    if (progressInterval.current) {
+      clearInterval(progressInterval.current);
+    }
+
+    progressInterval.current = setInterval(() => {
+      saveProgress(selectedLecture._id);
+    }, 30000);
+
+    return () => {
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
+    };
+  }, [selectedLecture, selectedCourse]);
+
+  useEffect(() => {
+    return () => {
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 flex flex-col md:flex-row gap-6">
@@ -37,10 +152,12 @@ function ViewLecture() {
         <div className="aspect-video bg-black rounded-xl overflow-hidden mb-4 border border-gray-300">
           {selectedLecture?.videoUrl ? (
             <video
+              ref={videoRef}
               src={selectedLecture.videoUrl}
               controls
               className="w-full h-full object-cover"
               crossOrigin="anonymous"
+              onEnded={() => markLessonComplete(selectedLecture._id)}
             />
           ) : (
             <div className="flex items-center justify-center h-full text-white">
@@ -52,7 +169,20 @@ function ViewLecture() {
         {/* Selected Lecture Info */}
         <div className="mt-2">
           <h2 className="text-lg font-semibold text-gray-800">{selectedLecture?.lectureTitle}</h2>
-          
+          {selectedLecture && (
+            progressData.completedLessons?.some(
+              (item) => item?.toString() === selectedLecture._id?.toString()
+            ) ? (
+              <p className="mt-2 text-sm font-medium text-green-600">This lesson is completed.</p>
+            ) : (
+              <button
+                onClick={() => markLessonComplete(selectedLecture._id)}
+                className="mt-3 inline-flex rounded-2xl bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+              >
+                Mark as Complete
+              </button>
+            )
+          )}
         </div>
       </div>
 
@@ -61,23 +191,30 @@ function ViewLecture() {
         <h2 className="text-xl font-bold mb-4 text-gray-800">All Lectures</h2>
         <div className="flex flex-col gap-3 mb-6">
           {selectedCourse?.lectures?.length > 0 ? (
-            selectedCourse.lectures.map((lecture, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedLecture(lecture)}
-                className={`flex items-center justify-between p-3 rounded-lg border transition text-left ${
-                  selectedLecture?._id === lecture._id
-                    ? 'bg-gray-200 border-gray-500'
-                    : 'hover:bg-gray-50 border-gray-300'
-                }`}
-              >
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-800">{lecture.lectureTitle}</h4>
-                  
-                </div>
-                <FaPlayCircle className="text-black text-xl" />
-              </button>
-            ))
+            selectedCourse.lectures.map((lecture, index) => {
+              const isCompleted = progressData.completedLessons?.some(
+                (item) => item?.toString() === lecture._id?.toString()
+              );
+              return (
+                <button
+                  key={index}
+                  onClick={() => setSelectedLecture(lecture)}
+                  className={`flex items-center justify-between p-3 rounded-lg border transition text-left ${
+                    selectedLecture?._id === lecture._id
+                      ? 'bg-gray-200 border-gray-500'
+                      : 'hover:bg-gray-50 border-gray-300'
+                  }`}
+                >
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-800">{lecture.lectureTitle}</h4>
+                    {isCompleted && (
+                      <p className="text-xs text-green-600">Completed</p>
+                    )}
+                  </div>
+                  <FaPlayCircle className="text-black text-xl" />
+                </button>
+              )
+            })
           ) : (
             <p className="text-gray-500">No lectures available.</p>
           )}
