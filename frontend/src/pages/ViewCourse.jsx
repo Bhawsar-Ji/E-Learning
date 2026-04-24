@@ -21,6 +21,11 @@ function ViewCourse() {
     const [creatorData , setCreatorData] = useState(null)
     const dispatch = useDispatch()
     const [selectedLecture, setSelectedLecture] = useState(null);
+    const [courseProgress, setCourseProgress] = useState({
+      progressPercentage: 0,
+      lastWatchedLesson: null,
+      lastWatchedLessonTitle: "",
+    });
     const {lectureData} = useSelector(state=>state.lecture)
     const {selectedCourseData} = useSelector(state=>state.course)
   const [selectedCreatorCourse,setSelectedCreatorCourse] = useState([])
@@ -89,6 +94,32 @@ console.log("Average Rating:", avgRating);
     checkEnrollment()
   }, [courseId,courseData,lectureData])
 
+  const fetchCourseProgress = async () => {
+    if (!courseId || !isEnrolled || !selectedCourseData) return;
+
+    try {
+      const response = await axios.get(`${serverUrl}/api/progress/${courseId}`, {
+        withCredentials: true,
+      });
+
+      const progress = response.data || {};
+      const lesson = selectedCourseData?.lectures?.find(
+        (lecture) => lecture._id?.toString() === progress.lastWatchedLesson?.toString()
+      );
+
+      setCourseProgress({
+        progressPercentage: progress.progressPercentage || 0,
+        lastWatchedLesson: progress.lastWatchedLesson,
+        lastWatchedLessonTitle: lesson?.lectureTitle || "",
+      });
+    } catch (error) {
+      console.error("Fetch course progress error", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourseProgress();
+  }, [isEnrolled, courseId, selectedCourseData]);
 
     // Fetch creator info once course data is available
   useEffect(() => {
@@ -208,6 +239,27 @@ setIsEnrolled(true)
                 <span className="line-through text-sm text-gray-400">₹599</span>
               </div>
             </div>
+
+            {/* Progress */}
+            {isEnrolled && (
+              <div className="mt-4">
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <span>Course progress</span>
+                  <span className="font-semibold text-gray-900">{courseProgress.progressPercentage}%</span>
+                </div>
+                <div className="mt-2 h-3 overflow-hidden rounded-full bg-gray-200">
+                  <div
+                    className="h-full rounded-full bg-black transition-all duration-300"
+                    style={{ width: `${courseProgress.progressPercentage}%` }}
+                  />
+                </div>
+                {courseProgress.lastWatchedLessonTitle && (
+                  <p className="mt-2 text-sm text-gray-600">
+                    Resume from <span className="font-medium text-gray-900">{courseProgress.lastWatchedLessonTitle}</span>
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Highlights */}
             <ul className="text-sm text-gray-700 space-y-1 pt-2">
