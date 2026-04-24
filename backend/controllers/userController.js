@@ -1,5 +1,6 @@
 import uploadOnCloudinary from "../configs/cloudinary.js";
 import User from "../models/userModel.js";
+import Progress from "../models/progressModel.js";
 
 export const getCurrentUser = async (req,res) => {
     try {
@@ -29,22 +30,39 @@ export const getDashboard = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
+        const courseIds = (user.enrolledCourses || []).map((course) => course._id);
+        const progressRecords = await Progress.find({
+            userId: req.userId,
+            courseId: { $in: courseIds }
+        });
+
+        const progressMap = progressRecords.reduce((map, progress) => {
+            map[progress.courseId.toString()] = progress;
+            return map;
+        }, {});
+
         const enrolledCourses = (user.enrolledCourses || []).map((course) => ({
             courseId: course._id,
             title: course.title,
             thumbnail: course.thumbnail,
             instructor: course.creator?.name || "Unknown Instructor",
-            progress: 0
+            progress: progressMap[course._id.toString()]?.progressPercentage || 0
         }));
 
-        const lastCourse = enrolledCourses.length > 0 ? user.enrolledCourses[user.enrolledCourses.length - 1] : null;
+        const lastCourse = user.enrolledCourses.length > 0 ? user.enrolledCourses[user.enrolledCourses.length - 1] : null;
+        const lastProgress = lastCourse ? progressMap[lastCourse._id.toString()] : null;
+        const watchedLessonId = lastProgress?.lastWatchedLesson || lastCourse?.lectures?.[0]?._id || null;
+        const watchedLesson = lastCourse?.lectures?.find(
+            (lecture) => lecture._id.toString() === watchedLessonId?.toString()
+        );
+
         const continueLearning = lastCourse
             ? {
                 courseId: lastCourse._id,
                 courseTitle: lastCourse.title,
                 courseThumbnail: lastCourse.thumbnail,
-                lessonId: lastCourse.lectures?.[0]?._id || null,
-                lessonTitle: lastCourse.lectures?.[0]?.lectureTitle || "Start learning"
+                lessonId: watchedLessonId,
+                lessonTitle: watchedLesson?.lectureTitle || "Start learning"
             }
             : {};
 
