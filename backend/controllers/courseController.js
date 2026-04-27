@@ -153,7 +153,7 @@ export const getCourseLecture = async (req,res) => {
 export const editLecture = async (req,res) => {
     try {
         const {lectureId} = req.params
-        const {isPreviewFree , lectureTitle} = req.body
+        const {isPreviewFree , lectureTitle, youtubeLink} = req.body
         const lecture = await Lecture.findById(lectureId)
           if(!lecture){
             return res.status(404).json({message:"Lecture not found"})
@@ -167,6 +167,9 @@ export const editLecture = async (req,res) => {
             lecture.lectureTitle = lectureTitle
         }
         lecture.isPreviewFree = isPreviewFree
+        if(youtubeLink){
+            lecture.youtubeLink = youtubeLink
+        }
         
          await lecture.save()
         return res.status(200).json(lecture)

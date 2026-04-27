@@ -11,7 +11,16 @@ const lectureSchema = new mongoose.Schema({
     isPreviewFree:{
         type:Boolean
     },
-    
+    youtubeLink:{
+        type: String,
+        required: false, // Optional to maintain backward compatibility
+        validate: {
+          validator: function (v) {
+            return /^(https?:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/.test(v);
+          },
+          message: props => `${props.value} is not a valid YouTube URL!`
+        }
+    }
 },{timestamps:true})
 
 

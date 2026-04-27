@@ -17,16 +17,20 @@ function EditLecture() {
     const [videoUrl,setVideoUrl] = useState(null)
     const [lectureTitle,setLectureTitle] = useState(selectedLecture.lectureTitle)
     const [isPreviewFree,setIsPreviewFree] = useState(false)
-
-    const formData = new FormData()
-    formData.append("lectureTitle",lectureTitle)
-    formData.append("videoUrl",videoUrl)
-    formData.append("isPreviewFree",isPreviewFree)
-    
+    const [youtubeLink, setYoutubeLink] = useState(selectedLecture?.youtubeLink || "");
 
     const editLecture = async () => {
       setLoading(true)
       try {
+        const formData = new FormData()
+        formData.append("lectureTitle",lectureTitle)
+        if(videoUrl) {
+          formData.append("videoUrl",videoUrl)
+        }
+        formData.append("isPreviewFree",isPreviewFree)
+        if(youtubeLink) {
+          formData.append("youtubeLink",youtubeLink)
+        }
         const result = await axios.post(serverUrl + `/api/course/editlecture/${lectureId}` , formData , {withCredentials:true})
         console.log(result.data)
         dispatch(setLectureData([...lectureData,result.data]))
@@ -55,15 +59,6 @@ function EditLecture() {
       }
       
     }
-
-
-
-
-
-
-   
-
-    
 
     const navigate = useNavigate()
   return (
@@ -98,13 +93,23 @@ function EditLecture() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Video *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Video</label>
             <input
               type="file"
-              required
               accept='video/*'
               className="w-full border border-gray-300 rounded-md p-2 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:bg-gray-700 file:text-[white] hover:file:bg-gray-500"
               onChange={(e)=>setVideoUrl(e.target.files[0])}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Or Video Link</label>
+            <input
+              type="url"
+              className="w-full p-3 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[black]focus:outline-none"
+              value={youtubeLink}
+              onChange={(e) => setYoutubeLink(e.target.value)}
+              placeholder="Enter YouTube video link (e.g., https://www.youtube.com/watch?v=...)"
             />
           </div>
 
