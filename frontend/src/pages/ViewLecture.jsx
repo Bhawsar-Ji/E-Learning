@@ -132,9 +132,30 @@ function ViewLecture() {
     };
   }, []);
 
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return "";
+    // Handle youtu.be short links
+    let videoIdMatch = url.match(/youtu\.be\/([^\?&]+)/);
+    if (videoIdMatch) return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+
+    // Handle normal and mobile links
+    videoIdMatch = url.match(/[?&]v=([^&]+)/);
+    if (videoIdMatch) return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+
+    // Handle /embed/ links (already correct)
+    if (url.includes("/embed/")) return url;
+
+    // Fallback: try to extract after last slash
+    const lastSlash = url.lastIndexOf("/");
+    if (lastSlash !== -1) {
+      const id = url.substring(lastSlash + 1);
+      if (id.length >= 11) return `https://www.youtube.com/embed/${id}`;
+    }
+    return "";
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 flex flex-col md:flex-row gap-6">
-     
       {/* Left - Video & Course Info */}
       <div className="w-full md:w-2/3 bg-white rounded-2xl shadow-md p-6 border border-gray-200">
         {/* Course Details */}
@@ -150,7 +171,17 @@ function ViewLecture() {
 
         {/* Video Player */}
         <div className="aspect-video bg-black rounded-xl overflow-hidden mb-4 border border-gray-300">
-          {selectedLecture?.videoUrl ? (
+          {selectedLecture?.youtubeLink ? (
+            <iframe
+              width="100%"
+              height="100%"
+              src={getYouTubeEmbedUrl(selectedLecture.youtubeLink)}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          ) : selectedLecture?.videoUrl ? (
             <video
               ref={videoRef}
               src={selectedLecture.videoUrl}
