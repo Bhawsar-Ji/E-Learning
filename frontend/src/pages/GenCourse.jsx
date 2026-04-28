@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { serverUrl } from "../App";
 
 function GenCourse() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function GenCourse() {
       setLoading(true);
 
       // 🔥 API CALL
-      const res = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/ai/generate-ai`, {
+      const res = await axios.post(`${serverUrl}/api/ai/generate-ai`, {
         topic,
         language,
         level,

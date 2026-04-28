@@ -20,7 +20,7 @@ function CreateLecture() {
     const createLectureHandler = async () => {
       setLoading(true)
       try {
-        const result = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/course/createlecture/${courseId}` ,{lectureTitle} , {withCredentials:true})
+        const result = await axios.post(`${serverUrl}/api/course/createlecture/${courseId}` ,{lectureTitle} , {withCredentials:true})
         console.log(result.data)
       dispatch(setLectureData([...lectureData,result.data.lecture]))
         toast.success("Lecture Created")
