@@ -200,6 +200,29 @@ function ViewLecture() {
         {/* Selected Lecture Info */}
         <div className="mt-2">
           <h2 className="text-lg font-semibold text-gray-800">{selectedLecture?.lectureTitle}</h2>
+          
+          {/* Display uploaded resource files (PDF/DOC) */}
+          {selectedLecture?.files && selectedLecture.files.length > 0 && (
+            <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <h4 className="text-sm font-semibold text-gray-700 mb-2">Lecture Resources</h4>
+              <ul className="space-y-2">
+                {selectedLecture.files.map((file, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">📄</span>
+                    <a 
+                      href={file.url.startsWith('http') ? file.url : `${serverUrl}${file.url}`}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {file.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
           {selectedLecture && (
             progressData.completedLessons?.some(
               (item) => item?.toString() === selectedLecture._id?.toString()

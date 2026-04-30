@@ -18,6 +18,11 @@ function EditLecture() {
     const [lectureTitle,setLectureTitle] = useState(selectedLecture.lectureTitle)
     const [isPreviewFree,setIsPreviewFree] = useState(false)
     const [youtubeLink, setYoutubeLink] = useState(selectedLecture?.youtubeLink || "");
+    const [resourceFiles, setResourceFiles] = useState([]);
+
+    const handleFileChange = (e) => {
+        setResourceFiles(e.target.files);
+    };
 
     const editLecture = async () => {
       setLoading(true)
@@ -30,6 +35,12 @@ function EditLecture() {
         formData.append("isPreviewFree",isPreviewFree)
         if(youtubeLink) {
           formData.append("youtubeLink",youtubeLink)
+        }
+        // Append resource files (PDF/DOC)
+        if(resourceFiles && resourceFiles.length > 0) {
+          for(let i = 0; i < resourceFiles.length; i++) {
+            formData.append("files", resourceFiles[i]);
+          }
         }
         const result = await axios.post(serverUrl + `/api/course/editlecture/${lectureId}` , formData , {withCredentials:true})
         console.log(result.data)
@@ -123,6 +134,17 @@ function EditLecture() {
               onChange={() => setIsPreviewFree(prev=>!prev)}
             />
             <label htmlFor="isFree" className="text-sm text-gray-700">Is this video FREE</label>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upload Resources: </label>
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx"
+              multiple
+              className="w-full p-3 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[black]focus:outline-none"
+              onChange={handleFileChange}
+              placeholder="Upload PDF/DOC files (e.g .pdf, .doc)"
+            />
           </div>
         </div>
          <div>

@@ -171,6 +171,15 @@ export const editLecture = async (req,res) => {
             lecture.youtubeLink = youtubeLink
         }
         
+        // Handle file uploads (PDF/DOC)
+        if(req.files && req.files['files']) {
+            const fileData = req.files['files'].map(file => ({
+                url: `/public/${file.filename}`,
+                name: file.originalname
+            }));
+            lecture.files = fileData;
+        }
+        
          await lecture.save()
         return res.status(200).json(lecture)
     } catch (error) {

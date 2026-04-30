@@ -20,7 +20,13 @@ const lectureSchema = new mongoose.Schema({
           },
           message: props => `${props.value} is not a valid YouTube URL!`
         }
-    }
+    },
+    files: [
+      {
+        url: String,
+        name: String
+      }
+    ]
 },{timestamps:true})
 
 

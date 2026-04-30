@@ -15,6 +15,7 @@ dotenv.config()
 let port = process.env.PORT || 8000
 let app = express()
 app.use(express.json())
+app.use("/public", express.static("public"))
 app.use(cookieParser())
 const allowedOrigins = [
   process.env.FRONTEND_URL || "https://e-learning-1-2qnu.onrender.com",
