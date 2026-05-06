@@ -60,8 +60,8 @@ function App() {
         <Route path='/' element={<Home/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='/developers' element={<Developers/>}/>
-        <Route path='/generate-ai' element={<GenCourse/>}/>
-        <Route path='/result' element={<ResultPage/>}/>
+        <Route path='/generate-ai' element={userData?<GenCourse/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/result' element={userData?<ResultPage/>:userData?<GenCourse/>:<Navigate to={"/signup"}/>}/>
 
         <Route path='/signup' element={!userData?<SignUp/>:<Navigate to={"/"}/>}/>
         <Route path='/profile' element={userData?<Profile/>:<Navigate to={"/signup"}/>}/>

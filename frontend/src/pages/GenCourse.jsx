@@ -18,23 +18,24 @@ function GenCourse() {
     try {
       setLoading(true);
 
-      // 🔥 API CALL
-      const res = await axios.post(`${serverUrl}/api/ai/generate-ai`, {
-        topic,
-        language,
-        level,
-      },{
-  withCredentials: true
-});
+      const res = await axios.post(
+        `${serverUrl}/api/ai/generate-ai`,
+        {
+          topic,
+          language,
+          level,
+        },
+        {
+          withCredentials: true,
+        },
+      );
 
       const result = res.data;
       console.log(result);
 
-      // 👉 result page me bhej
       navigate("/result", { state: result });
-
     } catch (err) {
-      console.log(err)
+      console.log(err.message);
       alert("API Error");
     } finally {
       setLoading(false);
@@ -43,7 +44,6 @@ function GenCourse() {
 
   return (
     <div className="pt-4 min-h-screen gap-10 bg-gradient-to-br from-gray-100 to-gray-200 px-6 py-8">
-
       {/* HEADER */}
       <motion.header
         initial={{ opacity: 0, y: -15 }}
@@ -54,9 +54,6 @@ function GenCourse() {
           Generate Course with AI
         </h1>
 
-        <p className="text-sm text-black">
-          Generate courses with AI instantly
-        </p>
       </motion.header>
 
       {/* FORM CARD */}
@@ -65,7 +62,6 @@ function GenCourse() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-xl mx-auto rounded-2xl bg-white/60 backdrop-blur-lg border border-white/30 p-8 shadow-[0_15px_40px_rgba(0,0,0,0.15)] space-y-5 mt-5"
       >
-
         {/* Topic */}
         <input
           value={topic}
@@ -99,9 +95,11 @@ function GenCourse() {
           onClick={handleGenerate}
           disabled={loading}
           className={`w-full py-3 rounded-xl text-white font-medium transition
-            ${loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-gradient-to-r from-indigo-500 to-purple-600 hover:opacity-90"}
+            ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-indigo-500 to-purple-600 hover:opacity-90"
+            }
           `}
         >
           {loading ? "Generating..." : "Generate Course "}
