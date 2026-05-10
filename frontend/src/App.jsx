@@ -29,6 +29,7 @@ import SearchWithAi from './pages/SearchWithAi'
 import getAllReviews from './customHooks/getAllReviews'
 import GenCourse from './pages/GenCourse'
 import ResultPage from './pages/ResultPage'
+import ExamPage from './pages/ExamPage'
 
 export const serverUrl = import.meta.env.VITE_SERVER_URL || "https://e-learning-m3z7.onrender.com"
 
@@ -60,8 +61,10 @@ function App() {
         <Route path='/' element={<Home/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='/developers' element={<Developers/>}/>
-        <Route path='/generate-ai' element={userData?<GenCourse/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/result' element={userData?<ResultPage/>:userData?<GenCourse/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/examboard' element={<ExamPage />}/>
+
+        <Route path='/generate-ai' element={userData?<GenCourse/>:<Navigate to={"/signup"} />}/>
+        <Route path='/result' element={userData?<ResultPage/>:<Navigate to={"/generate-ai"}/>}/>
 
         <Route path='/signup' element={!userData?<SignUp/>:<Navigate to={"/"}/>}/>
         <Route path='/profile' element={userData?<Profile/>:<Navigate to={"/signup"}/>}/>

@@ -1,5 +1,7 @@
+import axios from "axios";
+import { serverUrl } from "../App";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { PiBookOpenBold } from "react-icons/pi";
 import { FaArrowLeftLong } from "react-icons/fa6";
@@ -14,6 +16,39 @@ function ResultPage() {
   const [openIndex, setOpenIndex] = useState(0);
 
   const [completedSections, setCompletedSections] = useState([]);
+  useEffect(() => {
+
+  const fetchProgress = async () => {
+
+    try {
+
+      const res = await axios.get(
+        `${serverUrl}/api/aiprogress/${state.aiCourseId}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (res.data?.completedSections) {
+
+        setCompletedSections(
+          res.data.completedSections
+        );
+
+      }
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+  };
+
+  if (state?.aiCourseId) {
+    fetchProgress();
+  }
+
+}, [data]);
 
   if (!data) {
     return <div className="text-center mt-20">No Data</div>;
@@ -27,11 +62,33 @@ function ResultPage() {
       totalSections) *
     100;
 
-  const markComplete = (index) => {
-    if (!completedSections.includes(index)) {
-      setCompletedSections([...completedSections, index]);
-    }
-  };
+const markComplete = async (index) => {
+  
+  if (completedSections.includes(index)) return;
+
+  try {
+
+    await axios.post(
+      `${serverUrl}/api/aiprogress/update`,
+      {
+        aiCourseId: state.aiCourseId,
+        completedSection: index
+      },
+      {
+        withCredentials: true,
+      }
+    );
+
+    setCompletedSections([
+      ...completedSections,
+      index,
+    ]);
+
+  } catch (error) {
+
+    console.log(error);
+  }
+};
 
   // 🎨 COLORS
   const colors = [
@@ -397,7 +454,7 @@ function ResultPage() {
         <div className="max-w-7xl mx-auto mt-8 text-center">
           <button onClick={() =>
     navigate("/examboard", {
-      state: { courseId: data._id },
+      state: { aiCourseId: state.aiCourseId },
     })
   }
             className="

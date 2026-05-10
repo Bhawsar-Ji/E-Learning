@@ -60,7 +60,7 @@ function DashboardPage() {
 
           {/* RIGHT BUTTON */}
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white border shadow-sm hover:bg-gray-100 transition"
           >
             <FaArrowLeftLong className="w-4 h-4" />

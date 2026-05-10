@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { toast } from "react-toastify";
 
 function GenCourse() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ function GenCourse() {
   const [loading, setLoading] = useState(false);
 
   const handleGenerate = async () => {
-    if (!topic) return alert("Enter topic");
+    if (!topic) return toast.error("Enter topic");
 
     try {
       setLoading(true);
@@ -31,12 +32,13 @@ function GenCourse() {
       );
 
       const result = res.data;
+      toast.success("Course Generated")
       console.log(result);
 
       navigate("/result", { state: result });
     } catch (err) {
       console.log(err.message);
-      alert("API Error");
+      toast.error("API Error");
     } finally {
       setLoading(false);
     }
