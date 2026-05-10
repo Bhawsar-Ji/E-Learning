@@ -1,6 +1,6 @@
 import express from "express"
 import isAuth from "../middlewares/isAuth.js"
-import { createCourse, createLecture, editCourse, editLecture, getCourseById, getCourseLecture, getCreatorById, getCreatorCourses, getPublishedCourses, removeCourse, removeLecture } from "../controllers/courseController.js"
+import { createCourse, createLecture, editCourse, editLecture, getAiCourseById, getCourseById, getCourseLecture, getCreatorById, getCreatorCourses, getPublishedCourses, removeCourse, removeLecture } from "../controllers/courseController.js"
 import { updateLecture } from "../controllers/lectureController.js"
 import upload from "../middlewares/multer.js"
 
@@ -17,5 +17,6 @@ courseRouter.get("/getcourselecture/:courseId",isAuth,getCourseLecture)
 courseRouter.post("/editlecture/:lectureId",isAuth,upload.fields([{name: "videoUrl", maxCount: 1}, {name: "files", maxCount: 10}]),editLecture)
 courseRouter.delete("/removelecture/:lectureId",isAuth,removeLecture)
 courseRouter.post("/getcreator",isAuth,getCreatorById)
+courseRouter.get("/aicourse/:courseId",isAuth,getAiCourseById)
 
 export default courseRouter

@@ -21,17 +21,19 @@ export const geminiGenerate = async (req, res) => {
 
     const aiResponse = await generateResponse(aiPrompt);
 
+    const { quiz, ...courseData } = aiResponse;
     const aiCourse = await aiCourseModel.create({
       user: user._id,
       title: topic,
       classLevel: level,
       courseLanguage:language,
-      content: aiResponse,
+      content: courseData,
+      quiz : quiz
     });
 
     user.enrolledCourses.push(aiCourse._id);
     await user.save();
-    return res.status(200).json({ data: aiResponse, aiCourseId: aiCourse._id });
+    return res.status(200).json({ data: courseData, aiCourseId: aiCourse._id });
   } catch (error) {
     console.error(error);
     res.status(500).json({

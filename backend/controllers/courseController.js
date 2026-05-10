@@ -2,6 +2,7 @@ import uploadOnCloudinary from "../configs/cloudinary.js"
 import Course from "../models/courseModel.js"
 import Lecture from "../models/lectureModel.js"
 import User from "../models/userModel.js"
+import aiCourse from "../models/aiCourseModel.js"
 
 // create Courses
 export const createCourse = async (req,res) => {
@@ -233,6 +234,34 @@ export const getCreatorById = async (req, res) => {
   }
 };
 
+// Ai course find for quiz
+export const getAiCourseById = async (req, res) => {
+  try {
 
+    const { courseId } = req.params;
 
+    const course = await aiCourse.findById(courseId);
 
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      quiz: course.quiz,
+      title: course.title,
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+}

@@ -10,6 +10,7 @@ import paymentRouter from "./routes/paymentRoute.js"
 import aiRouter from "./routes/aiRoute.js"
 import reviewRouter from "./routes/reviewRoute.js"
 import progressRouter from "./routes/progressRoute.js"
+import aiProgressRouter from "./routes/aiProgressRoute.js"
 dotenv.config()
 
 let port = process.env.PORT || 8000
@@ -43,6 +44,7 @@ app.use("/api/generate-ai", aiRouter)
 app.use("/api/review", reviewRouter)
 app.use("/api/reviews", reviewRouter)
 app.use("/api/progress", progressRouter)
+app.use("/api/aiprogress", aiProgressRouter);
 
 app.get("/" , (req,res)=>{
     res.send("Hello From Server")
