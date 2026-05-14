@@ -151,43 +151,58 @@ export const getCourseLecture = async (req,res) => {
     }
 }
 
-export const editLecture = async (req,res) => {
-    try {
-        const {lectureId} = req.params
-        const {isPreviewFree , lectureTitle, youtubeLink} = req.body
-        const lecture = await Lecture.findById(lectureId)
-          if(!lecture){
-            return res.status(404).json({message:"Lecture not found"})
-        }
-        let videoUrl
-        if(req.file){
-            videoUrl =await uploadOnCloudinary(req.file.path)
-            lecture.videoUrl = videoUrl
-                }
-        if(lectureTitle){
-            lecture.lectureTitle = lectureTitle
-        }
-        lecture.isPreviewFree = isPreviewFree
-        if(youtubeLink){
-            lecture.youtubeLink = youtubeLink
-        }
-        
-        // Handle file uploads (PDF/DOC)
-        if(req.files && req.files['files']) {
-            const fileData = req.files['files'].map(file => ({
-                url: `/public/${file.filename}`,
-                name: file.originalname
-            }));
-            lecture.files = fileData;
-        }
-        
-         await lecture.save()
-        return res.status(200).json(lecture)
-    } catch (error) {
-        return res.status(500).json({message:`Failed to edit Lectures ${error}`})
+export const editLecture = async (req, res) => {
+  try {
+    const { lectureId } = req.params;
+    const { isPreviewFree, lectureTitle, youtubeLink } = req.body;
+
+    const lecture = await Lecture.findById(lectureId);
+
+    if (!lecture) {
+      return res.status(404).json({ message: "Lecture not found" });
     }
-    
-}
+
+    let videoUrl;
+
+    if (req.file) {
+      videoUrl = await uploadOnCloudinary(req.file.path);
+      lecture.videoUrl = videoUrl;
+    }
+
+    if (lectureTitle) {
+      lecture.lectureTitle = lectureTitle;
+    }
+
+    lecture.isPreviewFree = isPreviewFree;
+
+    if (youtubeLink) {
+      lecture.youtubeLink = youtubeLink;
+    }
+
+    if (req.files && req.files["files"]) {
+      const uploadedFiles = await Promise.all(
+        req.files["files"].map(async (file) => {
+          const fileUrl = await uploadOnCloudinary(file.path);
+
+          return {
+            url: fileUrl,
+            name: file.originalname,
+          };
+        })
+      );
+
+      lecture.files = uploadedFiles;
+    }
+
+    await lecture.save();
+
+    return res.status(200).json(lecture);
+  } catch (error) {
+    return res.status(500).json({
+      message: `Failed to edit Lectures ${error}`,
+    });
+  }
+};
 
 export const removeLecture = async (req,res) => {
     try {

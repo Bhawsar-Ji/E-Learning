@@ -5,6 +5,14 @@ import { generateResponse } from "./aiController.js";
 
 export const geminiGenerate = async (req, res) => {
   try {
+    const CREDIT_COST_BY_LEVEL = {
+      Beginner: 5,
+      Intermediate: 8,
+      Advanced: 10,
+    };
+
+    const COURSE_GENERATION_COST = CREDIT_COST_BY_LEVEL[level] || 5;
+
     const { topic, language = "Hindi", level = "Beginner" } = req.body;
     if (!topic) {
       return res.status(400).json({ message: "Topic is required" });
@@ -12,6 +20,11 @@ export const geminiGenerate = async (req, res) => {
     const user = await userModel.findById(req.userId);
     if (!user) {
       return res.status(400).json({ message: "User is not found" });
+    }
+    if (user.credits < COURSE_GENERATION_COST) {
+      return res.status(400).json({
+        message: "Not enough credits",
+      });
     }
     const aiPrompt = buildPrompt({
       topic,
@@ -26,14 +39,27 @@ export const geminiGenerate = async (req, res) => {
       user: user._id,
       title: topic,
       classLevel: level,
-      courseLanguage:language,
+      courseLanguage: language,
       content: courseData,
-      quiz : quiz
+      quiz: quiz,
     });
 
     user.enrolledCourses.push(aiCourse._id);
+    user.credits -= COURSE_GENERATION_COST;
+
+    user.transactions.push({
+      type: "spent",
+      amount: COURSE_GENERATION_COST,
+      description: `Generated ${level} AI course: ${topic}`,
+    });
     await user.save();
-    return res.status(200).json({ data: courseData, aiCourseId: aiCourse._id });
+    return res.status(200).json({
+      data: courseData,
+      quiz,
+      aiCourseId: aiCourse._id,
+      remainingCredits: user.credits,
+      message: "Course generated successfully",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({

@@ -17,10 +17,19 @@ Generate structured learning content for "${topic}" in STRICT JSON format.
 - No comments, no trailing commas
 - Do Not use emojis inside text values
 
-STRUCTURE RULES:
+LEVEL BASED STRUCTURE RULES:
 
-- Minimum 6 and maximum 10 headings (main learning components)
-- Each heading must have EXACTLY 5 points
+- If level is "Beginner":
+  - Generate EXACTLY 4 headings
+  - Each heading must have EXACTLY 3 points
+
+- If level is "Intermediate":
+  - Generate EXACTLY 6 headings
+  - Each heading must have EXACTLY 5 points
+
+- If level is "Advanced":
+  - Generate EXACTLY 10 headings
+  - Each heading must have EXACTLY 7 points
 - Each point must include:
   - explanation (15–20 words)
 - Add example ONLY where applicable
@@ -36,13 +45,17 @@ CONTENT RULES:
 - Do NOT write short phrases
 - content MUST be Markdown formatted
 - Keep content clean and structured
-- Code must be simple and correct
-- Keep code examples very small and focused on one concept only
+- Code examples must follow the selected level difficulty
+- Beginner examples should be very small and easy
+- Intermediate examples should be practical and moderately detailed
+- Advanced examples should include deeper logic, patterns, or optimization concepts
 
 QUIZ RULES:
 
 - Generate EXACTLY 10 multiple-choice questions based on the course content
-- Questions should be distributed across different sections
+- Quiz questions must cover all generated sections
+- Distribute questions across sections as evenly as possible
+- Do not create all questions from only one or two sections
 - Each question must include:
   - id (number)
   - question (string)
@@ -60,16 +73,19 @@ QUIZ RULES:
   - Explain basic concepts clearly
   - Avoid technical jargon
   - Use real-life simple examples
+  - Keep code examples very short and beginner-friendly
 
 - If Level is "Intermediate":
   - Use moderate technical terms
   - Focus on practical understanding
   - Include slightly deeper explanations
+  - Use practical coding examples with moderate complexity
 
 - If Level is "Advanced":
   - Use technical and precise language
   - Focus on optimization, patterns, and best practices
   - Avoid basic explanations
+  - Use advanced examples with real-world coding practices
 
 LANGUAGE RULES:
 

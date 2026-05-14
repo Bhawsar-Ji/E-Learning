@@ -3,46 +3,83 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
     },
     email: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     password: {
-      type: String
-      
+      type: String,
     },
     description: {
-      type: String
+      type: String,
     },
     role: {
       type: String,
       enum: ["educator", "student"],
-      required: true
+      required: true,
     },
     photoUrl: {
       type: String,
-      default: ""
+      default: "",
     },
-    enrolledCourses: [{
+    enrolledCourses: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+      },
+    ],
+    resetOtp: {
+      type: String,
+    },
+    otpExpires: {
+      type: Date,
+    },
+    isOtpVerifed: {
+      type: Boolean,
+      default: false,
+    },
+    examResults: [
+  {
+    courseId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Course'
-    }],
-    resetOtp:{
-      type:String
+      ref: "aiCourse",
     },
-    otpExpires:{
-      type:Date
+    score: Number,
+    totalQuestions: Number,
+    percentage: Number,
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
-    isOtpVerifed:{
-      type:Boolean,
-      default:false
-    }
-    
   },
-  { timestamps: true }
+],
+    credits: {
+      type: Number,
+      default: 20,
+    },
+
+    transactions: [
+      {
+        type: {
+          type: String,
+          enum: ["earned", "spent", "purchased"],
+        },
+
+        amount: Number,
+
+        description: String,
+
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+  },
+  { timestamps: true },
 );
 
 const User = mongoose.model("User", userSchema);

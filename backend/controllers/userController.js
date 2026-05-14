@@ -95,6 +95,7 @@ const continueLearningAi = lastAiCourse
           lessonTitle: `Progress ${lastAiProgress?.progressPercentage || 0}%`,
           isAiCourse: true,
           content: lastAiCourse.content,
+          progress: lastAiProgress?.progressPercentage || 0,
       }
     : null;
 
@@ -120,6 +121,7 @@ const continueLearningAi = lastAiCourse
           courseThumbnail: lastCourse.thumbnail,
           lessonId: watchedLessonId,
           lessonTitle: watchedLesson?.lectureTitle || "Start learning",
+          progress: lastProgress?.progressPercentage || 0,
       }
     : {};
 
@@ -127,6 +129,8 @@ const continueLearningAi = lastAiCourse
       enrolledCourses: [...enrolledCourses, ...formattedAiCourses],
       continueLearning,
       recentLessons: [],
+      credits: user.credits || 0,
+  transactions: user.transactions || [],
     });
   } catch (error) {
     console.log(error);
@@ -156,5 +160,61 @@ export const UpdateProfile = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: `Update Profile Error  ${error}` });
+  }
+};
+
+export const saveResult = async (req, res) => {
+  try {
+    const { courseId, score, totalQuestions, percentage } = req.body;
+
+    const user = await User.findById(req.userId);
+
+    const existingResult = user.examResults.find(
+      (item) => item.courseId.toString() === courseId
+    );
+
+    if (existingResult) {
+      return res.status(200).json({
+        success: true,
+        result: existingResult,
+        message: "Result already exists",
+      });
+    }
+
+    user.examResults.push({
+      courseId,
+      score,
+      totalQuestions,
+      percentage,
+    });
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      result: user.examResults[user.examResults.length - 1],
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Result save failed" });
+  }
+};
+
+export const getExamResult = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    const result = user.examResults.find(
+      (item) => item.courseId.toString() === req.params.courseId
+    );
+
+    if (!result) {
+      return res.status(404).json({ success: false, message: "No result found" });
+    }
+
+    res.status(200).json({ success: true, result });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Result fetch failed" });
   }
 };
