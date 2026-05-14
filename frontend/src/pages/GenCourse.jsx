@@ -25,7 +25,7 @@ function GenCourse() {
     Advanced: 10,
   };
 
-  const requiredCredits = creditCostByLevel[level] || 5;
+const requiredCredits = creditCostByLevel[level] || creditCostByLevel["Beginner"] || 5;
 
   useEffect(() => {
     const fetchUserCredits = async () => {
