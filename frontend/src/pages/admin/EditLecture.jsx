@@ -141,7 +141,7 @@ function EditLecture() {
               type="file"
               accept=".pdf,.doc,.docx"
               multiple
-              className="w-full p-3 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[black]focus:outline-none"
+              className="w-full border border-gray-300 rounded-md p-2 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:bg-gray-700 file:text-[white] hover:file:bg-gray-500"
               onChange={handleFileChange}
               placeholder="Upload PDF/DOC files (e.g .pdf, .doc)"
             />

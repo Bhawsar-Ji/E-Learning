@@ -16,39 +16,31 @@ function ResultPage() {
   const [openIndex, setOpenIndex] = useState(0);
 
   const [completedSections, setCompletedSections] = useState([]);
+  const [completingIndex, setCompletingIndex] = useState(null);
+  const [examLoading, setExamLoading] = useState(false);
+
   useEffect(() => {
-
-  const fetchProgress = async () => {
-
-    try {
-
-      const res = await axios.get(
-        `${serverUrl}/api/aiprogress/${state.aiCourseId}`,
-        {
-          withCredentials: true,
-        }
-      );
-
-      if (res.data?.completedSections) {
-
-        setCompletedSections(
-          res.data.completedSections
+    const fetchProgress = async () => {
+      try {
+        const res = await axios.get(
+          `${serverUrl}/api/aiprogress/${state.aiCourseId}`,
+          {
+            withCredentials: true,
+          },
         );
 
+        if (res.data?.completedSections) {
+          setCompletedSections(res.data.completedSections);
+        }
+      } catch (error) {
+        console.log(error);
       }
+    };
 
-    } catch (error) {
-
-      console.log(error);
-
+    if (state?.aiCourseId) {
+      fetchProgress();
     }
-  };
-
-  if (state?.aiCourseId) {
-    fetchProgress();
-  }
-
-}, [data]);
+  }, [data]);
 
   if (!data) {
     return <div className="text-center mt-20">No Data</div>;
@@ -62,33 +54,30 @@ function ResultPage() {
       totalSections) *
     100;
 
-const markComplete = async (index) => {
-  
-  if (completedSections.includes(index)) return;
+  const markComplete = async (index) => {
+    if (completedSections.includes(index)) return;
 
-  try {
+    try {
+      setCompletingIndex(index);
 
-    await axios.post(
-      `${serverUrl}/api/aiprogress/update`,
-      {
-        aiCourseId: state.aiCourseId,
-        completedSection: index
-      },
-      {
-        withCredentials: true,
-      }
-    );
+      await axios.post(
+        `${serverUrl}/api/aiprogress/update`,
+        {
+          aiCourseId: state.aiCourseId,
+          completedSection: index,
+        },
+        {
+          withCredentials: true,
+        },
+      );
 
-    setCompletedSections([
-      ...completedSections,
-      index,
-    ]);
-
-  } catch (error) {
-
-    console.log(error);
-  }
-};
+      setCompletedSections([...completedSections, index]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setCompletingIndex(null);
+    }
+  };
 
   // 🎨 COLORS
   const colors = [
@@ -155,7 +144,7 @@ const markComplete = async (index) => {
 
         {/* RIGHT BUTTON */}
         <button
-          onClick={() => navigate("/generate-ai")}
+          onClick={() => navigate(-1)}
           className="
             flex items-center justify-center gap-2
             px-5 py-3
@@ -280,21 +269,26 @@ const markComplete = async (index) => {
                     {/* COMPLETE BUTTON */}
                     <button
                       onClick={() => markComplete(index)}
-                      disabled={isCompleted}
+                      disabled={isCompleted || completingIndex === index}
                       className={`
-                  mt-6
-                  px-5 py-3
-                  rounded-xl
-                  font-medium
-                  transition
-                  ${
-                    isCompleted
-                      ? "bg-gray-300 cursor-not-allowed"
-                      : "bg-black text-white hover:bg-green-600"
-                  }
-                `}
+    mt-6 px-5 py-3 rounded-xl font-medium transition
+    ${
+      isCompleted
+        ? "bg-gray-300 cursor-not-allowed"
+        : "bg-black text-white hover:bg-green-600"
+    }
+  `}
                     >
-                      {isCompleted ? "Completed" : "Mark as Complete"}
+                      {completingIndex === index ? (
+                        <span className="flex items-center gap-2">
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          Saving...
+                        </span>
+                      ) : isCompleted ? (
+                        "Completed"
+                      ) : (
+                        "Mark as Complete"
+                      )}
                     </button>
                   </motion.div>
                 )}
@@ -427,23 +421,29 @@ const markComplete = async (index) => {
             {/* BUTTON */}
             <button
               onClick={() => markComplete(openIndex)}
-              disabled={completedSections.includes(openIndex)}
+              disabled={
+                completedSections.includes(openIndex) ||
+                completingIndex === openIndex
+              }
               className={`
-          mt-8
-          px-5 py-3
-          rounded-xl
-          font-medium
-          transition
-          ${
-            completedSections.includes(openIndex)
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-black text-white hover:bg-green-600"
-          }
-        `}
+    mt-8 px-5 py-3 rounded-xl font-medium transition
+    ${
+      completedSections.includes(openIndex)
+        ? "bg-gray-300 cursor-not-allowed"
+        : "bg-black text-white hover:bg-green-600"
+    }
+  `}
             >
-              {completedSections.includes(openIndex)
-                ? "Completed"
-                : "Mark as Complete"}
+              {completingIndex === openIndex ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Saving...
+                </span>
+              ) : completedSections.includes(openIndex) ? (
+                "Completed"
+              ) : (
+                "Mark as Complete"
+              )}
             </button>
           </motion.div>
         </>
@@ -452,11 +452,17 @@ const markComplete = async (index) => {
       {/* COURSE COMPLETE */}
       {completedSections.length === totalSections && totalSections > 0 && (
         <div className="max-w-7xl mx-auto mt-8 text-center">
-          <button onClick={() =>
-    navigate("/examboard", {
-      state: { aiCourseId: state.aiCourseId },
-    })
-  }
+          <button
+          disabled={examLoading}
+            onClick={() => {
+              setExamLoading(true);
+
+              setTimeout(() => {
+                navigate("/examboard", {
+                  state: { aiCourseId: state.aiCourseId },
+                });
+              }, 800);
+            }}
             className="
                 px-8 py-4
                 bg-black
@@ -468,7 +474,14 @@ const markComplete = async (index) => {
                 transition
               "
           >
-            Take Exam
+            {examLoading ? (
+  <span className="flex items-center gap-2">
+    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+    Opening Exam...
+  </span>
+) : (
+  "Take Exam"
+)}
           </button>
         </div>
       )}

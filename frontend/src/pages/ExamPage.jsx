@@ -15,8 +15,8 @@ function ExamPage() {
   const location = useLocation();
 
 const aiCourseId = location.state?.aiCourseId;
-console.log(location.state);
-console.log(aiCourseId);
+// console.log(location.state);
+// console.log(aiCourseId);
   
 
   const [quiz, setQuiz] = useState([]);
@@ -58,14 +58,14 @@ console.log(aiCourseId);
 
         try {
           const resultRes = await axios.get(
-            `${serverUrl}/api/user/exam-result/${aiCourseId}`,
+            `${serverUrl}/api/users/exam-result/${aiCourseId}`,
             {
               withCredentials: true,
             }
           );
 
           if (resultRes.data.success) {
-            setExistingResult(resultRes.data.result);
+            setExistingResult(resultRes.data.result); 
 
             setExamFinished(true);
           }
@@ -136,7 +136,7 @@ console.log(aiCourseId);
 
     try {
       await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/api/user/save-result`,
+        `${serverUrl}/api/users/save-result`,
         {
           courseId:aiCourseId,
           score,
@@ -187,7 +187,7 @@ console.log(aiCourseId);
 
       try {
         await axios.post(
-          `${import.meta.env.VITE_SERVER_URL}/api/user/save-result`,
+          `${serverUrl}/api/users/save-result`,
           {
             courseId:aiCourseId,
             score: finalScore,

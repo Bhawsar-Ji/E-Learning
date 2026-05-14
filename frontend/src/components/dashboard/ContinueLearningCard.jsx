@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import ProgressBar from "./ProgressBar";
 
 function ContinueLearningCard({ continueLearning }) {
   const navigate = useNavigate();
@@ -42,9 +43,30 @@ function ContinueLearningCard({ continueLearning }) {
               {continueLearning.lessonTitle}
             </span>
           </p>
+          <div className="mt-5 space-y-2">
+            <div className="flex items-center justify-between text-sm text-gray-600">
+              <span>Progress</span>
+              <span className="font-semibold text-gray-900">
+                {continueLearning.progress || 0}%
+              </span>
+            </div>
+
+            <ProgressBar percent={continueLearning.progress || 0} />
+          </div>
         </div>
         <button
-          onClick={() => navigate(`/viewlecture/${continueLearning.courseId}`)}
+          onClick={() => {
+            if (continueLearning?.isAiCourse) {
+              navigate("/result", {
+                state: {
+                  ...continueLearning.content,
+                  aiCourseId: continueLearning.courseId,
+                },
+              });
+            } else {
+              navigate(`/viewlecture/${continueLearning.courseId}`);
+            }
+          }}
           className="inline-flex items-center justify-center rounded-2xl bg-black px-6 py-3 text-sm font-medium text-white transition hover:bg-gray-800"
         >
           Resume Learning

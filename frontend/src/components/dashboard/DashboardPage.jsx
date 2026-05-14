@@ -1,140 +1,279 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import { useSelector } from 'react-redux'
-import { serverUrl } from '../../App'
-import { toast } from 'react-toastify'
-import ContinueLearningCard from './ContinueLearningCard'
-import EnrolledCourseCard from './EnrolledCourseCard'
-import { useNavigate } from 'react-router-dom'
-import { FaArrowLeftLong } from "react-icons/fa6";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { serverUrl } from "../../App";
+import { toast } from "react-toastify";
+import DashboardSidebar from "./DashboardSidebar";
+import CreditsSection from "../creditComponents/CreditsSection";
+import ContinueLearningCard from "./ContinueLearningCard";
+import EnrolledCourseCard from "./EnrolledCourseCard";
+import ExploreCoursesCard from "./ExploreCoursesCard";
+import TransactionCard from "../creditComponents/TransactionCard";
+import { useNavigate } from "react-router-dom";
+
+import {
+  FaBookOpen,
+  FaRobot,
+  FaBars,
+  FaWallet,
+  FaTrophy,
+  FaChartLine,
+} from "react-icons/fa";
 
 function DashboardPage() {
-  const navigate = useNavigate()
-  const { userData } = useSelector((state) => state.user)
-  const [dashboardData, setDashboardData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate();
+  const { userData } = useSelector((state) => state.user);
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const response = await axios.get(`${serverUrl}/api/users/dashboard`, {
-          withCredentials: true
-        })
-        setDashboardData(response.data)
-      } catch (error) {
-        console.error(error)
-        toast.error(error?.response?.data?.message || 'Failed to load dashboard')
-      } finally {
-        setLoading(false)
-      }
-    }
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false);
 
-    fetchDashboard()
-  }, [])
+  const fetchDashboard = async () => {
+  try {
+    const response = await axios.get(`${serverUrl}/api/users/dashboard`, {
+      withCredentials: true,
+    });
 
-  const enrolledCourses = dashboardData?.enrolledCourses || []
-  const continueLearning = dashboardData?.continueLearning || {}
+    setDashboardData(response.data);
+  } catch (error) {
+    toast.error(
+      error?.response?.data?.message || "Failed to load dashboard"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchDashboard();
+}, []);
+
+  const enrolledCourses = dashboardData?.enrolledCourses || [];
+  const continueLearning = dashboardData?.continueLearning || {};
+  const credits = dashboardData?.credits || 0;
+  const transactions = dashboardData?.transactions || [];
+
+  const aiCourses = enrolledCourses.filter((course) => course.isAiCourse);
+  const normalCourses = enrolledCourses.filter((course) => !course.isAiCourse);
+
+  const spentCredits = transactions
+    .filter((item) => item.type === "spent")
+    .reduce((total, item) => total + (item.amount || 0), 0);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f7f8fc] p-8">
+        <div className="h-96 rounded-[40px] bg-slate-200 animate-pulse" />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#fbfcff] via-[#f7f8ff] to-[#f5f3ff] text-gray-900">
+      <div className="flex">
+        <>
+          {/* MOBILE SIDEBAR */}
+          {showSidebar && (
+            <div className="fixed inset-0 z-50 flex lg:hidden">
+              <div
+                className="absolute inset-0 bg-black/40"
+                onClick={() => setShowSidebar(false)}
+              />
 
-      <div className="mx-auto max-w-7xl space-y-8">
-
-        {/* 🚀 HERO + BACK BUTTON */}
-        <div className="rounded-3xl bg-white p-8 shadow-sm border flex flex-col md:flex-row items-center justify-between gap-6">
-
-          {/* LEFT */}
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-gray-500">
-              Student Dashboard
-            </p>
-
-            <h1 className="mt-3 text-3xl font-semibold text-gray-900">
-              Welcome back{userData?.name ? `, ${userData.name}` : ''}!
-            </h1>
-
-            <p className="mt-2 text-gray-600 max-w-2xl">
-              See everything you are learning in one place. Resume courses, track progress, and keep moving forward.
-            </p>
-          </div>
-
-          {/* RIGHT BUTTON */}
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white border shadow-sm hover:bg-gray-100 transition"
-          >
-            <FaArrowLeftLong className="w-4 h-4" />
-            <span className="text-sm font-medium">Back to Home</span>
-          </button>
-
-        </div>
-
-        {/* ⏳ LOADING */}
-        {loading ? (
-          <div className="space-y-6">
-            <div className="h-56 rounded-3xl bg-slate-200 animate-pulse" />
-            <div className="grid gap-4 md:grid-cols-3">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="h-64 rounded-3xl bg-slate-200 animate-pulse" />
-              ))}
+              <div className="relative z-50">
+                <DashboardSidebar
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  navigate={navigate}
+                  userData={userData}
+                  setShowSidebar={setShowSidebar}
+                />
+              </div>
             </div>
+          )}
+
+          {/* DESKTOP SIDEBAR */}
+          <div className="hidden lg:block">
+            <DashboardSidebar
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              navigate={navigate}
+              userData={userData}
+            />
           </div>
-        ) : (
-          <>
+        </>
 
-            {/* 📘 CONTINUE LEARNING */}
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                Continue Learning
-              </h2>
+        <main className="w-full lg:ml-[260px]">
+          <div className="mx-auto max-w-7xl px-5 py-8">
+            <div className="mb-4 flex items-center justify-between lg:hidden">
+              <button
+                onClick={() => setShowSidebar(true)}
+                className="rounded-2xl bg-black p-3 text-white"
+              >
+                <FaBars />
+              </button>
 
-              <div className="bg-white p-6 rounded-3xl shadow-sm border">
-                <ContinueLearningCard continueLearning={continueLearning} />
+              
+            </div>
+            <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-black">
+                  Student Dashboard
+                </p>
+                <h1 className="mt-2 text-4xl font-bold">
+                  Welcome back{userData?.name ? `, ${userData.name}` : ""} 👋
+                </h1>
+                <p className="mt-3 text-gray-500">
+                  Manage your courses, AI credits and learning progress.
+                </p>
+              </div>
+              <div className="flex flex-row item-center justify-between gap-2">
+                <button
+                  onClick={() => navigate("/generate-ai")}
+                  className="rounded-2xl bg-black px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-indigo-600"
+                >
+                  + Generate New
+                </button>
+                {userData?.role === "educator" && (
+                  <button
+                    onClick={() => navigate("/educator-dashboard")}
+                    className="rounded-2xl bg-black px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-indigo-600"
+                  >
+                    Educator Dashboard
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* 📚 ENROLLED COURSES */}
-            <div className="space-y-4">
+            {activeTab === "dashboard" && (
+              <div className="space-y-6">
+                <CreditsSection
+                  credits={credits}
+                  setActiveTab={setActiveTab}
+                  activeTab={activeTab}
+                  refreshUser={fetchDashboard}
+                  
+                />
 
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <h2 className="text-2xl font-semibold text-gray-900">
-                    Enrolled Courses
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Track your course progress and jump back in.
-                  </p>
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                  <StatCard
+                    icon={<FaBookOpen />}
+                    label="Enrolled"
+                    value={normalCourses.length}
+                  />
+                  <StatCard
+                    icon={<FaRobot />}
+                    label="AI Courses"
+                    value={aiCourses.length}
+                  />
+                  <StatCard
+                    icon={<FaWallet />}
+                    label="Credits Spent"
+                    value={spentCredits}
+                  />
+                  <StatCard
+                    icon={<FaChartLine />}
+                    label="Total Courses"
+                    value={enrolledCourses.length}
+                  />
                 </div>
 
-                <div className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700">
-                  {enrolledCourses.length} course{enrolledCourses.length === 1 ? '' : 's'} enrolled
-                </div>
+                <section className="rounded-[34px] bg-white/75 p-6 shadow-[0_15px_45px_rgba(15,23,42,0.05)]">
+                  <h2 className="mb-5 text-2xl font-bold">Continue Learning</h2>
+                  <ContinueLearningCard continueLearning={continueLearning} />
+                </section>
+
+                <ExploreCoursesCard />
               </div>
+            )}
 
-              {enrolledCourses.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-gray-300 bg-white p-10 text-center">
-                  <p className="text-xl font-semibold text-gray-900">
-                    No enrollments yet
-                  </p>
-                  <p className="mt-3 text-gray-600">
-                    You haven&apos;t enrolled in any courses. Explore the catalog to start learning.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid gap-5 lg:grid-cols-2">
-                  {enrolledCourses.map((course) => (
-                    <EnrolledCourseCard key={course.courseId} course={course} />
-                  ))}
-                </div>
-              )}
+            {activeTab === "courses" && (
+              <CourseSection title="My Courses" courses={normalCourses} />
+            )}
 
-            </div>
+            {activeTab === "ai" && (
+              <CourseSection
+                title="AI Generated Courses"
+                courses={aiCourses}
+                emptyText="No AI courses generated yet."
+              />
+            )}
 
-          </>
-        )}
+            {activeTab === "credits" && (
+              <CreditsSection
+                credits={credits}
+                setActiveTab={setActiveTab}
+                activeTab={activeTab}
+                refreshUser={fetchDashboard}
+              />
+            )}
+
+            {activeTab === "transactions" && (
+              <TransactionCard transactions={transactions} />
+            )}
+
+            {activeTab === "certificates" && (
+              <ComingSoon title="Certificates" />
+            )}
+
+            {activeTab === "settings" && <ComingSoon title="Settings" />}
+          </div>
+        </main>
       </div>
     </div>
-  )
+  );
 }
 
-export default DashboardPage
+function CourseSection({ title, courses, emptyText = "No courses yet." }) {
+  return (
+    <div className="space-y-6">
+      <section className="rounded-[34px] bg-white/75 p-6 shadow-[0_15px_45px_rgba(15,23,42,0.05)]">
+        <h2 className="mb-6 text-2xl font-bold">{title}</h2>
+
+        {courses.length === 0 ? (
+          <div className="rounded-[28px] bg-gray-50 p-12 text-center">
+            <p className="text-xl font-semibold">{emptyText}</p>
+          </div>
+        ) : (
+          <div className="grid gap-5 lg:grid-cols-2">
+            {courses.map((course) => (
+              <EnrolledCourseCard key={course.courseId} course={course} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <ExploreCoursesCard />
+    </div>
+  );
+}
+
+
+function StatCard({ icon, label, value }) {
+  return (
+    <div className="rounded-[28px] bg-white/75 p-5 shadow-[0_10px_35px_rgba(15,23,42,0.05)]">
+      <div className="mb-4 inline-flex rounded-2xl bg-indigo-50 p-3 text-indigo-600">
+        {icon}
+      </div>
+
+      <p className="text-sm text-gray-500">{label}</p>
+
+      <h3 className="mt-2 text-3xl font-bold">{value}</h3>
+    </div>
+  );
+}
+
+function ComingSoon({ title }) {
+  return (
+    <div className="rounded-[34px] bg-white/75 p-12 text-center shadow-[0_15px_45px_rgba(15,23,42,0.05)]">
+      <FaTrophy className="mx-auto text-5xl text-indigo-500" />
+
+      <h2 className="mt-5 text-2xl font-bold">{title}</h2>
+
+      <p className="mt-2 text-gray-500">This section will be added soon.</p>
+    </div>
+  );
+}
+
+export default DashboardPage;

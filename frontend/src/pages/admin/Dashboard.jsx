@@ -1,46 +1,53 @@
-
-import React from 'react'
+import React from "react";
 import { useSelector } from "react-redux";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 import img from "../../assets/empty.jpg";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { FaArrowLeftLong } from "react-icons/fa6";
 
 function Dashboard() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { userData } = useSelector((state) => state.user);
   const { creatorCourseData } = useSelector((state) => state.course);
 
-  const courseProgressData = creatorCourseData?.map(course => ({
-    name: course.title.slice(0, 10) + "...",
-    lectures: course.lectures.length || 0
-  })) || [];
+  const courseProgressData =
+    creatorCourseData?.map((course) => ({
+      name: course.title.slice(0, 10) + "...",
+      lectures: course.lectures.length || 0,
+    })) || [];
 
-  const enrollData = creatorCourseData?.map(course => ({
-    name: course.title.slice(0, 10) + "...",
-    enrolled: course.enrolledStudents?.length || 0
-  })) || [];
+  const enrollData =
+    creatorCourseData?.map((course) => ({
+      name: course.title.slice(0, 10) + "...",
+      enrolled: course.enrolledStudents?.length || 0,
+    })) || [];
 
-  const totalEarnings = creatorCourseData?.reduce((sum, course) => {
-    const studentCount = course.enrolledStudents?.length || 0;
-    const courseRevenue = course.price ? course.price * studentCount : 0;
-    return sum + courseRevenue;
-  }, 0) || 0;
+  const totalEarnings =
+    creatorCourseData?.reduce((sum, course) => {
+      const studentCount = course.enrolledStudents?.length || 0;
+      const courseRevenue = course.price ? course.price * studentCount : 0;
+      return sum + courseRevenue;
+    }, 0) || 0;
 
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-10">
-
       {/* Back Button */}
-      <FaArrowLeftLong 
+      <FaArrowLeftLong
         className="w-6 h-6 cursor-pointer mb-6 text-gray-700 hover:text-black transition"
         onClick={() => navigate("/")}
       />
 
       <div className="max-w-7xl mx-auto space-y-10">
-
         {/* HERO SECTION */}
         <div className="bg-white rounded-3xl shadow-sm p-8 flex flex-col md:flex-row items-center justify-between gap-6 border">
-          
           <div className="flex items-center gap-5">
             <img
               src={userData?.photoUrl || img}
@@ -53,21 +60,32 @@ function Dashboard() {
                 👋 Welcome back, {userData?.name || "Educator"}
               </h1>
               <p className="text-gray-500 text-sm mt-1 max-w-md">
-                {userData?.description || "Manage your courses and track performance"}
+                {userData?.description ||
+                  "Manage your courses and track performance"}
               </p>
 
               <p className="mt-2 text-lg font-medium text-gray-800">
-                Total Earnings: <span className="text-indigo-600 font-semibold">₹{totalEarnings.toLocaleString()}</span>
+                Total Earnings:{" "}
+                <span className="text-indigo-600 font-semibold">
+                  ₹{totalEarnings.toLocaleString()}
+                </span>
               </p>
             </div>
           </div>
-
+          <div className="flex flex-row item-center justify-between gap-2">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white"
+          >
+            Student Dashboard
+          </button>
           <button
             onClick={() => navigate("/courses")}
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium hover:opacity-90 transition"
+            className="rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white"
           >
             + Create Course
           </button>
+          </div>
         </div>
 
         {/* STATS */}
@@ -82,7 +100,10 @@ function Dashboard() {
           <div className="bg-white p-6 rounded-2xl shadow-sm border">
             <p className="text-sm text-gray-500">Total Students</p>
             <h2 className="text-2xl font-semibold mt-2">
-              {creatorCourseData?.reduce((sum, c) => sum + (c.enrolledStudents?.length || 0), 0)}
+              {creatorCourseData?.reduce(
+                (sum, c) => sum + (c.enrolledStudents?.length || 0),
+                0,
+              )}
             </h2>
           </div>
 
@@ -96,7 +117,6 @@ function Dashboard() {
 
         {/* CHARTS */}
         <div className="grid md:grid-cols-2 gap-6">
-
           {/* Lectures Chart */}
           <div className="bg-white rounded-3xl shadow-sm p-6 border">
             <h2 className="text-lg font-semibold mb-4 text-gray-800">
@@ -131,10 +151,9 @@ function Dashboard() {
             </ResponsiveContainer>
           </div>
         </div>
-
       </div>
     </div>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;

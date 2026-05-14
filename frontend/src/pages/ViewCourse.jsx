@@ -61,7 +61,7 @@ function ViewCourse() {
 
 // Usage:
 const avgRating = calculateAverageRating(selectedCourseData?.reviews);
-console.log("Average Rating:", avgRating);
+// console.log("Average Rating:", avgRating);
 
   
 
@@ -132,7 +132,7 @@ console.log("Average Rating:", avgRating);
             { withCredentials: true }
           );
           setCreatorData(result.data);
-          console.log(result.data)
+          // console.log(result.data)
         } catch (error) {
           console.error("Error fetching creator:", error);
         }
@@ -212,7 +212,7 @@ setIsEnrolled(true)
              
           {/* Thumbnail */}
           <div className="w-full md:w-1/2">
-             <FaArrowLeftLong  className='text-[black] w-[22px] h-[22px] cursor-pointer' onClick={()=>navigate("/")}/>
+             <FaArrowLeftLong  className='text-[black] w-[22px] h-[22px] cursor-pointer' onClick={()=>navigate(-1)}/>
             {selectedCourseData?.thumbnail ? <img
               src={selectedCourseData?.thumbnail}
               alt="Course Thumbnail"

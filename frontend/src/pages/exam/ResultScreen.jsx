@@ -46,7 +46,7 @@ function ResultScreen({
         {/* TITLE */}
         <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
           {existingResult
-            ? "Previous Exam Result"
+            ? "Previous Attempt Result"
             : "Exam Completed"}
         </h1>
 
