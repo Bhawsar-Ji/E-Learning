@@ -236,7 +236,7 @@ setIsEnrolled(true)
               </div>
               <div>
                 <span className="text-lg font-semibold text-black">{selectedCourseData?.price}</span>{" "}
-                <span className="line-through text-sm text-gray-400">₹599</span>
+                <span className="line-through text-sm text-gray-400">₹19999</span>
               </div>
             </div>
 

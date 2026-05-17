@@ -2,30 +2,51 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import path from "path";
 
-const uploadOnCloudinary = async (filePath) => {
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-  });
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
+const uploadOnCloudinary = async (filePath) => {
   try {
     if (!filePath) return null;
 
     const ext = path.extname(filePath).toLowerCase();
 
-    const rawTypes = [".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx"];
+    const rawTypes = [
+      ".pdf",
+      ".doc",
+      ".docx",
+      ".ppt",
+      ".pptx",
+      ".xls",
+      ".xlsx",
+    ];
+
+    const isRawFile = rawTypes.includes(ext);
 
     const uploadResult = await cloudinary.uploader.upload(filePath, {
-      resource_type: rawTypes.includes(ext) ? "raw" : "auto",
+      resource_type: isRawFile ? "raw" : "auto",
     });
 
-    fs.unlinkSync(filePath);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
 
-    return uploadResult.secure_url;
+    return isRawFile
+      ? uploadResult.secure_url.replace(
+          "/raw/upload/",
+          "/raw/upload/fl_attachment/"
+        )
+      : uploadResult.secure_url;
   } catch (error) {
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    console.log(error);
+    console.log("CLOUDINARY ERROR:", error);
+
+    if (filePath && fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
     return null;
   }
 };

@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
 import { toast } from "react-toastify";
-import { FaArrowLeft, FaWallet, FaRobot } from "react-icons/fa6";
-import { FaMagic } from "react-icons/fa";
-import TransactionCard from "../components/creditComponents/TransactionCard"
+
+import { FaArrowLeft, FaWallet } from "react-icons/fa6";
+import { FaMagic, FaRobot } from "react-icons/fa";
+
+import TransactionCard from "../components/creditComponents/TransactionCard";
 
 function GenCourse() {
   const navigate = useNavigate();
@@ -216,6 +218,15 @@ function GenCourse() {
                 </p>
               )}
             </div>
+            {loading && (
+          <motion.div
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ repeat: Infinity, duration: 1.2 }}
+            className="mt-6 text-center font-medium text-black"
+          >
+            Generating your customized course …
+          </motion.div>
+        )}
           </motion.div>
 
           {/* COURSE INFO */}
@@ -319,16 +330,6 @@ function GenCourse() {
             )}
           </motion.div>
         </div>
-
-        {loading && (
-          <motion.div
-            animate={{ opacity: [0.4, 1, 0.4] }}
-            transition={{ repeat: Infinity, duration: 1.2 }}
-            className="mt-6 text-center font-medium text-black"
-          >
-            Generating your customized course …
-          </motion.div>
-        )}
       </div>
     </div>
   );

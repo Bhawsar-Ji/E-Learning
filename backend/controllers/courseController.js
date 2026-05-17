@@ -15,8 +15,13 @@ export const createCourse = async (req,res) => {
         const course = await Course.create({
             title,
             category,
-            creator: req.userId
+            creator: req.userId,
+            enrolledStudents: [req.userId],
         })
+
+        await User.findByIdAndUpdate(req.userId, {
+  $push: { enrolledCourses: course._id }
+});
         
         return res.status(201).json(course)
     } catch (error) {
@@ -61,6 +66,9 @@ export const editCourse = async (req,res) => {
         const {courseId} = req.params;
         const {title , subTitle , description , category , level , price , isPublished } = req.body;
         let thumbnail
+        console.log("REQ FILE:", req.file);
+console.log("REQ FILES:", req.files);
+console.log("BODY:", req.body);
          if(req.file){
             thumbnail =await uploadOnCloudinary(req.file.path)
                 }

@@ -52,9 +52,10 @@ export const getDashboard = async (req, res) => {
       instructor: course.creator?.name || "Unknown Instructor",
       progress: progressMap[course._id.toString()]?.progressPercentage || 0,
     }));
-    const aiCourses = await aiCourseModel.find({
-      user: req.userId,
-    });
+    const aiCourses = await aiCourseModel
+  .find({ user: req.userId })
+  .select("title createdAt")
+  .lean();
 
     const aiProgressRecords = await AiProgress.find({
       userId: req.userId,
@@ -130,7 +131,7 @@ const continueLearningAi = lastAiCourse
       continueLearning,
       recentLessons: [],
       credits: user.credits || 0,
-  transactions: user.transactions || [],
+      transactions: (user.transactions || []).slice(-10).reverse(),
     });
   } catch (error) {
     console.log(error);

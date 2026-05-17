@@ -12,6 +12,7 @@ let storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   // Allow both video files and document files
   if (
+    file.mimetype.startsWith("image/") ||
     file.mimetype.startsWith("video/") ||
     file.mimetype === "application/pdf" ||
     file.mimetype === "application/msword" ||

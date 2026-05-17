@@ -44,11 +44,25 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-700">
-        <div className="rounded-3xl border border-gray-200 bg-white px-8 py-6 shadow-sm">
-          Loading your experience...
-        </div>
-      </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#f7f8fc] px-4">
+  <div className="w-full max-w-md rounded-[32px] bg-white p-8 shadow-[0_15px_45px_rgba(15,23,42,0.06)]">
+    
+    <div className="flex justify-center">
+      <div className="h-14 w-14 rounded-full border-4 border-slate-200 border-t-black animate-spin" />
+    </div>
+
+    <h2 className="mt-6 text-center text-2xl font-bold text-gray-800">
+      Loading your experience...
+    </h2>
+
+    <div className="mt-8 space-y-4 animate-pulse">
+      <div className="h-4 w-full rounded-full bg-slate-200" />
+      <div className="h-4 w-5/6 rounded-full bg-slate-200" />
+      <div className="h-4 w-2/3 rounded-full bg-slate-200" />
+    </div>
+    
+  </div>
+</div>
     );
   }
 
